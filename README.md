@@ -20,18 +20,18 @@ resources and applications (hard drives, memory, processor statistics etc).
 ```yaml
 ---
 zabbix_proxy:
-# Enable zabbix-agent service or not.
+# Enable zabbix-proxy service or not.
 - enable: 'true'
-# Restart zabbix-agent service or not.
+# Restart zabbix-proxy service or not.
   restart: 'true'
-# Install/upgrade zabbix-agent package or not
+# Install/upgrade zabbix-proxy package or not
   install_package: 'true'
 # 'present' (do nothing if package is already installed) or 'latest' (always
 # upgrade to last version)
   package_state: 'latest'
 # Pre-shared key string.
   psk_string: '42a46dc13aff1bc26ba2467779da343614a8bbf1c39780c9819cf24e32d8f279'
-# Deploy or not 'psk_string' as '/etc/zabbix/zabbix_agentd.psk' file.
+# Deploy or not 'psk_string' as '/etc/zabbix/zabbix_proxy.psk' file.
   deploy_psk_file: 'true'
   settings:
 #   Proxy operating mode.
@@ -68,7 +68,7 @@ zabbix_proxy:
     log_type: 'system'
 #	Log file name for LogType 'file' parameter. Mandatory if 'log_type' is set to
 # 'file'.
-    log_file: '/var/log/zabbix_agent.log'
+    log_file: '/var/log/zabbix_proxy.log'
 #	Maximum size of log file in range 0-1024MB. '0' - disable automatic log
 # rotation. Default is '1'.
     log_file_size: '1'
@@ -103,7 +103,7 @@ zabbix_proxy:
 #   Database name.
 # For SQLite3 path to database file must be provided. DBUser and DBPassword are ignored.
 # Warning: do not attempt to use the same database Zabbix server is using.
-    db_name: /var/lib/zabbix_proxy/zabbix_proxy
+    db_name: /var/lib/zabbix-proxy/zabbix_proxy
 #   Database user. Ignored for SQLite.
     db_user: 'zabbix'
 #   Database password. Ignored for SQLite.

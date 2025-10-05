@@ -7,6 +7,9 @@
 {% if z.pid_file is defined and z.pid_file != '' %}
 {{ 'PidFile=' + z.pid_file }}
 {% endif %}
+{% if z.socket_dir is defined and z.socket_dir != '' %}
+{{ 'SocketDir=' + z.socket_dir }}
+{% endif %}
 {% if z.log_type is defined and z.log_type in ['system', 'file', 'console'] %}
 {{ 'LogType=' + z.log_type }}
 {% endif %}
@@ -37,6 +40,25 @@
 {% endif %}
 {% if zs %}
 {{ zs -}}
+{% endif %}
+{% if loop.last %}
+{{ '' }}
+{% else %}
+{{ ';' -}}
+{% endif %}
+{% endfor %}
+{% endif %}
+{% endif %}
+{% if z.stats_ip is defined and z.stats_ip != '' %}
+{% if z.stats_ip is string and z.stats_ip %}
+{{ 'StatsAllowedIP=' + z.stats_ip }}
+{% elif z.stats_ip is sequence %}
+{% for zsi in z.stats_ip %}
+{% if loop.first %}
+{{ 'StatsAllowedIP=' -}}
+{% endif %}
+{% if zsi %}
+{{ zsi -}}
 {% endif %}
 {% if loop.last %}
 {{ '' }}
@@ -127,6 +149,24 @@
 {% endif %}
 {% if z.user is defined and z.user != '' %}
 {{ 'User=' ~ z.user }}
+{% endif %}
+{% if z.db_host is defined and z.db_host != '' %}
+{{ 'DBHost=' ~ z.db_host }}
+{% endif %}
+{% if z.db_name is defined and z.db_name != '' %}
+{{ 'DBName=' ~ z.db_name }}
+{% endif %}
+{% if z.db_user is defined and z.db_user != '' %}
+{{ 'DBUser=' ~ z.db_user }}
+{% endif %}
+{% if z.db_password is defined and z.db_password != '' %}
+{{ 'DBPassword=' ~ z.db_password }}
+{% endif %}
+{% if z.db_socket is defined and z.db_socket != '' %}
+{{ 'DBSocket=' ~ z.db_socket }}
+{% endif %}
+{% if z.log_slow_query is defined and (z.log_slow_query > '1' <= '3600000') %}
+{{ 'LogSlowQueries=' ~ z.log_slow_query }}
 {% endif %}
 {% if z.include is defined and z.include != '' %}
 {% if z.include is string %}
