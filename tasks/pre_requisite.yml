@@ -1,0 +1,53 @@
+---
+- name: zabbix_proxy | Assert that system manager is systemd
+  ansible.builtin.assert:
+    that:
+      - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
+    msg: "System manager is not systemd."
+    quiet: "true"
+- name: zabbix_proxy | Add the OS specific varibles
+  ansible.builtin.include_vars:
+    file: "{{ hostvars[inventory_hostname]['ansible_os_family'] + '.yml' }}"
+- name: zabbix_proxy | Set facts about zabbix_proxy role
+  ansible.builtin.set_fact:
+    zabbix_proxy_state: "{{ hostvars[inventory_hostname]['zabbix_proxy'] |
+      community.general.json_query('[].package_state | [0]') }}"
+    zabbix_proxy_settings: "{{ hostvars[inventory_hostname]['zabbix_proxy'] |
+      community.general.json_query('[].settings[]') }}"
+    zabbix_proxy_psk_string: "{{ hostvars[inventory_hostname]['zabbix_proxy'] |
+      community.general.json_query('[].psk_string[] | [0]') }}"
+- name: zabbix_proxy | Assert that zabbix_proxy package state in valid value
+  ansible.builtin.assert:
+    that:
+      - "vars['zabbix_proxy_package_state'] in ['present', 'latest']"
+    msg: "'package_state' must be in 'present' or 'latest'."
+    quiet: "true"
+  when:
+    - "vars['zabbix_proxy_package_state'] is defined"
+    - "vars['zabbix_proxy_package_state'] != ''"
+- name: zabbix_proxy | Create Zabbix catalog
+  ansible.builtin.file:
+    path: "{{ hostvars[inventory_hostname]['zabbix_proxy_conf_dest'] }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+- name: zabbix_proxy | Create Zabbix psk catalog
+  ansible.builtin.file:
+    path: "{{ hostvars[inventory_hostname]['zabbix_proxy_psk_dest'] }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  when:
+    - "hostvars[inventory_hostname]['zabbix_proxy'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_deploy_psk_file']) is
+       defined"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_deploy_psk_file']) ==
+       'true'"
+  vars:
+    zabbix_proxy_deploy_psk_file:
+      "[] | map(&deploy_psk_file || 'false', @) | [0]"

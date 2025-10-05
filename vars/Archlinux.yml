@@ -1,0 +1,5 @@
+---
+zabbix_proxy_service: 'zabbix-proxy-sqlite'
+zabbix_proxy_package: 'zabbix-proxy'
+zabbix_proxy_conf_dest: '/etc/zabbix'
+zabbix_proxy_psk_dest: '/etc/zabbix'

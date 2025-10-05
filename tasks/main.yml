@@ -1,0 +1,33 @@
+---
+- ansible.builtin.import_tasks:
+    file: "pre_requisite.yml"
+- ansible.builtin.include_tasks:
+    file: "packages.yml"
+  when:
+    - "hostvars[inventory_hostname]['zabbix_proxy'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_install_package']) is
+       defined"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_install_package']) ==
+       'true'"
+  vars:
+    zabbix_proxy_install_package:
+      "[] | map(&install_package || 'false', @) | [0]"
+- ansible.builtin.include_tasks:
+    file: "deploy_zabbix_psk.yml"
+  when:
+    - "hostvars[inventory_hostname]['zabbix_proxy'] is defined"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] != ''"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_deploy_psk']) is defined"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_deploy_psk']) == 'true'"
+  vars:
+    zabbix_proxy_deploy_psk: "[] | map(&deploy_psk_file || 'false', @) | [0]"
+- ansible.builtin.include_tasks:
+    file: "deploy_zabbix_proxy.yml"
+  when:
+    - "vars['zabbix_proxy_settings'] is defined"
+    - "vars['zabbix_proxy_settings'] != []"

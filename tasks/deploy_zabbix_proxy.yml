@@ -1,0 +1,22 @@
+---
+- name: zabbix_proxy | Deploy zabbix-proxy conf
+  ansible.builtin.template:
+    src: "zabbix_proxy_conf.j2"
+    dest: "{{ vars['zabbix_proxy_conf_dest'] + '/zabbix_proxy.conf' }}"
+    group: "root"
+    owner: "root"
+    mode: "0644"
+    force: "yes"
+  notify:
+    - "Restart zabbix-proxy"
+- name: zabbix_proxy | Enable zabbix-proxy service
+  ansible.builtin.systemd:
+    name: "{{ hostvars[inventory_hostname]['zabbix_proxy_service'] }}"
+    enabled: "yes"
+  when:
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_enable']) is defined"
+    - "hostvars[inventory_hostname]['zabbix_proxy'] |
+       community.general.json_query(vars['zabbix_proxy_enable']) == 'true'"
+  vars:
+    zabbix_proxy_enable: "[] | map(&enable || 'false', @) | [0]"
